@@ -1,0 +1,14 @@
+#!/bin/sh /etc/rc.common
+
+START=99  # Set the priority of startup, 99 is the lowest and 1 is the highest.
+
+start() {        
+    echo starting DH OS...
+    # command to launch application
+    python3 /trb141_mqtt_io_uptime/main.py &
+}
+stop() {
+    echo stoping trb141_mqtt_io_uptime...
+    # commands to kill application
+    killall python3
+}

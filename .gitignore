@@ -1,0 +1,4 @@
+# AWS credential files
+AmazonRootCA1.pem
+certificate.pem.crt
+private.pem.key
