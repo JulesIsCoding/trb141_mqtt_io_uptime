@@ -3,6 +3,11 @@
 # Update the list of available packages
 echo "Updating package list..."
 opkg update
+opkg -e /etc/opkg/openwrt/distfeeds.conf update
+
+# Install Mosquitto client
+echo "Installing Mosquitto client..."
+opkg -e /etc/opkg/openwrt/distfeeds.conf install mosquitto-client-ssl
 
 # Install Python3
 echo "Installing Python3..."

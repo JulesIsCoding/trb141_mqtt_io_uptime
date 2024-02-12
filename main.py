@@ -29,10 +29,22 @@ def setup_logger(name, log_file, level):
 
 # Device authentication details.
 SERIAL_NUMBER = trb141_api.get_serial_number()
-ROOT_CA = os.environ.get("ROOT_CA")
-PRIVATE_KEY = os.environ.get("PRIVATE_KEY")
-CERT_FILE = os.environ.get("CERT_FILE")
 BROKER_ENDPOINT = os.environ.get("BROKER_ENDPOINT")
+
+# Path to your files
+root_ca_path = '/etc/trb141_mqtt_io_uptime/AmazonRootCA1.pem'
+private_key_path = '/etc/trb141_mqtt_io_uptime/private.pem.key'
+cert_file_path = '/etc/trb141_mqtt_io_uptime/certificate.pem.crt'
+
+# Reading the contents of the files
+with open(root_ca_path, 'r') as file:
+    ROOT_CA = file.read()
+
+with open(private_key_path, 'r') as file:
+    PRIVATE_KEY = file.read()
+
+with open(cert_file_path, 'r') as file:
+    CERT_FILE = file.read()
 
 # Thread for IO
 io_thread = {}
