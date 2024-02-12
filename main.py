@@ -5,7 +5,6 @@ import threading
 import signal
 import time
 from datetime import datetime
-from dotenv import load_dotenv
 import trb141_mqtt
 import trb141_db
 import trb141_api
@@ -27,9 +26,6 @@ def setup_logger(name, log_file, level):
     logger.addHandler(handler)
 
     return logger
-
-
-load_dotenv("/etc/trb141_mqtt_io_uptime/aws.env")
 
 # Device authentication details.
 SERIAL_NUMBER = trb141_api.get_serial_number()
@@ -88,23 +84,16 @@ if __name__ == "__main__":
 
     # Initialize the MQTT client
     stop_event = threading.Event()
-    mqtt_thread = threading.Thread(
-        target=trb141_mqtt.es_mqtt,
-        args=(
-            info_logger,
-            error_logger,
-            ROOT_CA,
-            PRIVATE_KEY,
-            CERT_FILE,
-            BROKER_ENDPOINT,
-            pub_topic,
-            sub_topic,
-            mqtt_queue,
-            thread_manager,
-            stop_event,
-        ),
+    mqtt_publish_thread = threading.Thread(
+        target=trb141_mqtt.mqtt_publisher,
+        args=(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, pub_topic, sub_topic, mqtt_queue, thread_manager, stop_event, ),
     )
-    mqtt_thread.start()
+    mqtt_publish_thread.start()
+    mqtt_subscribe_thread = threading.Thread(
+        target=trb141_mqtt.mqtt_subscriber,
+        args=(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, pub_topic, sub_topic, mqtt_queue, thread_manager, stop_event, ),
+    )
+    mqtt_subscribe_thread.start()
 
     # Main loop - check the keep_running flag periodically
     try:
@@ -137,4 +126,5 @@ if __name__ == "__main__":
             stop_flag = io_thread["stop_flag"]
             stop_flag.set()
             t.join()
-        mqtt_thread.join()
+        mqtt_publish_thread.join()
+        mqtt_subscribe_thread.join()

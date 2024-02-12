@@ -12,18 +12,6 @@ opkg install python3
 echo "Installing SQLite3..."
 opkg install python3-sqlite3
 
-# Install pip for Python3
-echo "Installing pip for Python3..."
-opkg install python3-pip
-
-# Install the Eclipse Paho MQTT Python client library
-echo "Installing Eclipse Paho MQTT Python client library..."
-pip3 install paho-mqtt
-
-# Install dotenv
-echo "Installing dotenv..."
-pip3 install python-dotenv
-
 # Create folders
 mkdir -p /trb141_mqtt_io_uptime
 mkdir -p /etc/trb141_mqtt_io_uptime

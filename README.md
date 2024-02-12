@@ -17,6 +17,9 @@ nano /storage/trb141_mqtt_io_uptime/certificate.pem.crt
 nano /storage/trb141_mqtt_io_uptime/private.pem.key
 ```
 
+### Copy aws.env file based on template.env
+The following init script will copy the files created above into the directory referenced in the template.env file.
+
 ### Install packages
 ```
 chmod +x /storage/trb141_mqtt_io_uptime/init.sh
