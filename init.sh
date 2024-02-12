@@ -21,7 +21,7 @@ cd /storage/trb141_mqtt_io_uptime/
 echo "Moving package to the correct directory..."
 mv trb141_api.py /trb141_mqtt_io_uptime/trb141_api.py
 mv trb141_db.py /trb141_mqtt_io_uptime/trb141_db.py
-mv mqtt.py /trb141_mqtt_io_uptime/mqtt.py
+mv trb141_mqtt.py /trb141_mqtt_io_uptime/trb141_mqtt.py
 mv trb141_runtime_manager.py /trb141_mqtt_io_uptime/trb141_runtime_manager.py
 mv trb141_runtime.py /trb141_mqtt_io_uptime/trb141_runtime.py
 mv trb141_utility_functions.py /trb141_mqtt_io_uptime/trb141_utility_functions.py
