@@ -42,11 +42,14 @@ def load_env_variables(env_file_path):
                 key, value = line.strip().split('=', 1)
                 os.environ[key] = value.strip("'")
 
-# Load your .env variables
+# Load .env variables
 load_env_variables('/etc/trb141_mqtt_io_uptime/aws.env')
 
-# Then access your BROKER_ENDPOINT
 BROKER_ENDPOINT = os.getenv('BROKER_ENDPOINT')
+BROKER_HOST = os.getenv('BROKER_HOST')
+BROKER_QOS = os.getenv('BROKER_QOS')
+BROKER_TLS_VERSION = os.getenv('BROKER_TLS_VERSION')
+BROKER_PROTOCOL_VERSION = os.getenv('BROKER_PROTOCOL_VERSION')
 
 # Reading the contents of the files
 with open(root_ca_path, 'r') as file:
@@ -110,7 +113,7 @@ if __name__ == "__main__":
     stop_event = threading.Event()
     mqtt_publish_thread = threading.Thread(
         target=trb141_mqtt.mqtt_publisher,
-        args=(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, pub_topic, mqtt_queue, stop_event ),
+        args=(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, BROKER_HOST, BROKER_QOS, pub_topic, BROKER_TLS_VERSION, BROKER_PROTOCOL_VERSION, mqtt_queue, stop_event),
     )
     mqtt_publish_thread.start()
     mqtt_subscribe_thread = threading.Thread(

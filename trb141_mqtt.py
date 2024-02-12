@@ -32,7 +32,7 @@ def mqtt_subscriber(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, 
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         error_logger.error(f"[{current_time}] Failed to start MQTT subscriber process: {e}", exc_info=True)
     
-def mqtt_publisher(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, pub_topic, mqtt_queue, stop_event):
+def mqtt_publisher(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, BROKER_HOST, BROKER_QOS, pub_topic, BROKER_TLS_VERSION, BROKER_PROTOCOL_VERSION, mqtt_queue, stop_event):
 
     def publish_message(message):
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -41,8 +41,8 @@ def mqtt_publisher(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, B
             message = json.dumps(message)
             
         # Prepare the command to publish the message
-        command = ['mosquitto_pub', '-h', BROKER_ENDPOINT, '-p', '8883', '--cafile', ROOT_CA, '--cert', CERT_FILE, '--key', PRIVATE_KEY, '-t', pub_topic, '-m', message]
-        
+        command = ['mosquitto_pub', '--cafile', ROOT_CA, '--cert', CERT_FILE,'--key', PRIVATE_KEY,'-h', BROKER_ENDPOINT, '-p', BROKER_HOST, '-q', BROKER_QOS, '-t', pub_topic, '--tls-version', BROKER_TLS_VERSION, '-d', '-V', BROKER_PROTOCOL_VERSION, '-m', message]
+        print(f"Publish message: {command}")
         # Execute the command
         try:
             subprocess.run(command, check=True, capture_output=True)
