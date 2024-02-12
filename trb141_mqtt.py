@@ -5,10 +5,10 @@ import trb141_utility_functions
 from datetime import datetime
 import subprocess
 
-def mqtt_subscriber(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, sub_topic, mqtt_queue, thread_manager, stop_event):
+def mqtt_subscriber(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, BROKER_HOST, BROKER_QOS, sub_topic, BROKER_TLS_VERSION, BROKER_PROTOCOL_VERSION, mqtt_queue, thread_manager, stop_event):
     try:
         # Command to subscribe and listen for messages
-        command = ['mosquitto_sub', '-h', BROKER_ENDPOINT, '-p', '8883', '--cafile', ROOT_CA, '--cert', CERT_FILE, '--key', PRIVATE_KEY, '-t', sub_topic]
+        command = ['mosquitto_sub', '--cafile', ROOT_CA, '--cert', CERT_FILE,'--key', PRIVATE_KEY, '-h', BROKER_ENDPOINT, '-p', BROKER_HOST, '-q', BROKER_QOS, '-t', sub_topic, '--tls-version', BROKER_TLS_VERSION, '-d', '-V', BROKER_PROTOCOL_VERSION]
         # Start the subprocess
         with subprocess.Popen(command, stdout=subprocess.PIPE, text=True, bufsize=1) as proc:
             while not stop_event.is_set():
@@ -42,7 +42,6 @@ def mqtt_publisher(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, B
             
         # Prepare the command to publish the message
         command = ['mosquitto_pub', '--cafile', ROOT_CA, '--cert', CERT_FILE,'--key', PRIVATE_KEY,'-h', BROKER_ENDPOINT, '-p', BROKER_HOST, '-q', BROKER_QOS, '-t', pub_topic, '--tls-version', BROKER_TLS_VERSION, '-d', '-V', BROKER_PROTOCOL_VERSION, '-m', message]
-        print(f"Publish message: {command}")
         # Execute the command
         try:
             subprocess.run(command, check=True, capture_output=True)
