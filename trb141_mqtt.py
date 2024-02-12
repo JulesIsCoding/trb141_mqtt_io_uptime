@@ -5,10 +5,10 @@ import trb141_utility_functions
 from datetime import datetime
 import subprocess
 
-def mqtt_subscriber(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, pub_topic, sub_topic, mqtt_queue, thread_manager, stop_event):
+def mqtt_subscriber(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, sub_topic, mqtt_queue, thread_manager, stop_event):
     try:
         # Command to subscribe and listen for messages
-        command = ['mosquitto_sub', '-h', BROKER_ENDPOINT, '--cafile', ROOT_CA, '--cert', CERT_FILE, '--key', PRIVATE_KEY, '-t', sub_topic]
+        command = ['mosquitto_sub', '-h', BROKER_ENDPOINT, '-p', '8883', '--cafile', ROOT_CA, '--cert', CERT_FILE, '--key', PRIVATE_KEY, '-t', sub_topic]
         # Start the subprocess
         with subprocess.Popen(command, stdout=subprocess.PIPE, text=True, bufsize=1) as proc:
             while not stop_event.is_set():
@@ -32,7 +32,7 @@ def mqtt_subscriber(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, 
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         error_logger.error(f"[{current_time}] Failed to start MQTT subscriber process: {e}", exc_info=True)
     
-def mqtt_publisher(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, pub_topic, sub_topic, mqtt_queue, thread_manager, stop_event):
+def mqtt_publisher(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, pub_topic, mqtt_queue, stop_event):
 
     def publish_message(message):
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -41,7 +41,7 @@ def mqtt_publisher(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, B
             message = json.dumps(message)
             
         # Prepare the command to publish the message
-        command = ['mosquitto_pub', '-h', BROKER_ENDPOINT, '--cafile', ROOT_CA, '--cert', CERT_FILE, '--key', PRIVATE_KEY, '-t', pub_topic, '-m', message]
+        command = ['mosquitto_pub', '-h', BROKER_ENDPOINT, '-p', '8883', '--cafile', ROOT_CA, '--cert', CERT_FILE, '--key', PRIVATE_KEY, '-t', pub_topic, '-m', message]
         
         # Execute the command
         try:

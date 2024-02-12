@@ -5,12 +5,6 @@ START=99  # Set the priority of startup, 99 is the lowest and 1 is the highest.
 start() {        
     echo starting trb141_mqtt_io_uptime...
 
-    # Load and export variables from .env file
-    while IFS='=' read -r key value
-    do
-        export "$key=$value"
-    done < /etc/trb141_mqtt_io_uptime/aws.env
-
     # Launch application
     python3 /trb141_mqtt_io_uptime/main.py &
 }

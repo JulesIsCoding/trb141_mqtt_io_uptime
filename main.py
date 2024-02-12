@@ -29,12 +29,24 @@ def setup_logger(name, log_file, level):
 
 # Device authentication details.
 SERIAL_NUMBER = trb141_api.get_serial_number()
-BROKER_ENDPOINT = os.environ.get("BROKER_ENDPOINT")
 
 # Path to your files
 root_ca_path = '/etc/trb141_mqtt_io_uptime/AmazonRootCA1.pem'
 private_key_path = '/etc/trb141_mqtt_io_uptime/private.pem.key'
 cert_file_path = '/etc/trb141_mqtt_io_uptime/certificate.pem.crt'
+
+def load_env_variables(env_file_path):
+    with open(env_file_path) as f:
+        for line in f:
+            if line.strip() and not line.startswith('#'):
+                key, value = line.strip().split('=', 1)
+                os.environ[key] = value.strip("'")
+
+# Load your .env variables
+load_env_variables('/etc/trb141_mqtt_io_uptime/aws.env')
+
+# Then access your BROKER_ENDPOINT
+BROKER_ENDPOINT = os.getenv('BROKER_ENDPOINT')
 
 # Reading the contents of the files
 with open(root_ca_path, 'r') as file:
@@ -98,12 +110,12 @@ if __name__ == "__main__":
     stop_event = threading.Event()
     mqtt_publish_thread = threading.Thread(
         target=trb141_mqtt.mqtt_publisher,
-        args=(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, pub_topic, sub_topic, mqtt_queue, thread_manager, stop_event, ),
+        args=(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, pub_topic, mqtt_queue, stop_event ),
     )
     mqtt_publish_thread.start()
     mqtt_subscribe_thread = threading.Thread(
         target=trb141_mqtt.mqtt_subscriber,
-        args=(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, pub_topic, sub_topic, mqtt_queue, thread_manager, stop_event, ),
+        args=(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, sub_topic, mqtt_queue, thread_manager, stop_event ),
     )
     mqtt_subscribe_thread.start()
 
