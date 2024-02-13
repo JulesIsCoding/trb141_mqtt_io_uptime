@@ -78,7 +78,7 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                     f"[{current_time}] No data returned for address {node['address']}"
                 )
             
-            print(f" Node {node["address"]} value: {current_gpio_status}")
+            print(f" Node {node['address']} value: {current_gpio_status}")
 
             # Determine if we should use 'value' or 'state'
             value_or_state = ( current_gpio_status.get("value") if "value" in current_gpio_status else current_gpio_status.get("state") )
@@ -146,7 +146,7 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                 if current_gpio_status is None:
                     raise ValueError(f"No data returned for address {node['address']}")
                 
-                print(f" GPIO {gpio["address"]} value: {current_gpio_status}")
+                print(f" GPIO {gpio['address']} value: {current_gpio_status}")
 
                 # Determine if we should use 'value' or 'state'
                 value_or_state = ( current_gpio_status.get("value") if "value" in current_gpio_status else current_gpio_status.get("state") )
