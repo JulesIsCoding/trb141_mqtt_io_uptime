@@ -20,29 +20,30 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
             {
                 "address": "ioman.dwi.dwi1",
                 "attributes": [
-                    {"name": "pin_2_uptime", "type": "time", "invert_input": True},
-                    {"name": "pin_2_status", "type": "boolean", "invert_input": True}
+                    {"name": "pin_2_status", "type": "boolean", "invert_input": True},
+                    {"name": "pin_2_uptime", "type": "time", "invert_input": True}
                 ]
             },
             {
                 "address": "ioman.gpio.dio0",
                 "attributes": [
-                    {"name": "pin_3_uptime", "type": "time", "invert_input": False},
-                    {"name": "pin_3_status", "type": "boolean", "invert_input": False}
+                    {"name": "pin_3_status", "type": "boolean", "invert_input": False},
+                    {"name": "pin_3_uptime", "type": "time", "invert_input": False}
                 ]
             },
             {
                 "address": "ioman.gpio.dio1",
                 "attributes": [
-                    {"name": "pin_4_uptime", "type": "time", "invert_input": False},
-                    {"name": "pin_4_status", "type": "boolean", "invert_input": False}
+                    {"name": "pin_4_status", "type": "boolean", "invert_input": False},
+                    {"name": "pin_4_uptime", "type": "time", "invert_input": False}
                 ]
             },
             {
                 "address": "ioman.gpio.iio",
                 "attributes": [
-                    {"name": "isolated_input_uptime", "type": "time", "invert_input": False},
-                    {"name": "isolated_input_status", "type": "boolean", "invert_input": False}
+                    {"name": "isolated_input_status", "type": "boolean", "invert_input": False},
+                    {"name": "isolated_input_uptime", "type": "time", "invert_input": False}
+                    
                 ]
             }
         ]
@@ -76,18 +77,14 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                 raise ValueError(
                     f"[{current_time}] No data returned for address {node['address']}"
                 )
+            
+            print(f" Node {node["address"]} value: {current_gpio_status}")
 
             # Determine if we should use 'value' or 'state'
-            value_or_state = (
-                current_gpio_status.get("value")
-                if "value" in current_gpio_status
-                else current_gpio_status.get("state")
-            )
+            value_or_state = ( current_gpio_status.get("value") if "value" in current_gpio_status else current_gpio_status.get("state") )
 
             if value_or_state is None:
-                raise ValueError(
-                    f"'value' or 'state' not found in response for address {node['address']}"
-                )
+                raise ValueError(f"'value' or 'state' not found in response for address {node['address']}")
 
             gpio = {
                 "address": node["address"],
@@ -148,13 +145,11 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                 )
                 if current_gpio_status is None:
                     raise ValueError(f"No data returned for address {node['address']}")
+                
+                print(f" GPIO {gpio["address"]} value: {current_gpio_status}")
 
                 # Determine if we should use 'value' or 'state'
-                value_or_state = (
-                    current_gpio_status.get("value")
-                    if "value" in current_gpio_status
-                    else current_gpio_status.get("state")
-                )
+                value_or_state = ( current_gpio_status.get("value") if "value" in current_gpio_status else current_gpio_status.get("state") )
 
                 if value_or_state is None:
                     raise ValueError(
@@ -251,6 +246,6 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
             message["readings"] = readings
             mqtt_queue.put(json.dumps(message))
 
-        time.sleep(0.1)
+        time.sleep(10)
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     info_logger.info(f"[{current_time}] IO thread stopping")
