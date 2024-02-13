@@ -61,6 +61,7 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
     message = {
         "serial_number": SERIAL_NUMBER,
         "message_id": uuid.uuid4().hex,
+        "timestamp": time.time(),
         "readings": [],
     }
 
@@ -94,7 +95,6 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                 name = attribute["name"]
                 reading = {
                     "name": name,
-                    "timestamp": timestamp,
                 }
                 if attribute["type"] == "time":
                     if name in persistent_data:
@@ -135,6 +135,7 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
         timestamp = time.time()
         readings = []
         message["message_id"] = uuid.uuid4().hex
+        message["timestamp"] = timestamp
 
         for gpio in gpios:
             try:
@@ -168,7 +169,6 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                                 attribute["timestamp"] = timestamp
                                 reading = {
                                     "name": name,
-                                    "timestamp": timestamp,
                                     "numericValue": attribute["value"],
                                 }
                                 readings.append(reading)
@@ -178,7 +178,6 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                                 attribute["timestamp"] = timestamp
                                 reading = {
                                     "name": name,
-                                    "timestamp": timestamp,
                                     "numericValue": attribute["value"],
                                 }
                                 readings.append(reading)
@@ -188,7 +187,6 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                             attribute["timestamp"] = timestamp
                             reading = {
                                 "name": name,
-                                "timestamp": timestamp,
                             }
                             if value_or_state == "1":
                                 reading.update({"booleanValue": True})
@@ -203,7 +201,6 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                                     attribute["value"] += time_elapsed
                                 reading = {
                                     "name": name,
-                                    "timestamp": timestamp,
                                     "numericValue": attribute["value"],
                                 }
                                 readings.append(reading)
@@ -211,7 +208,6 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                             else:
                                 reading = {
                                     "name": name,
-                                    "timestamp": timestamp,
                                 }
                                 if value_or_state == "1":
                                     reading.update({"booleanValue": True})
@@ -242,6 +238,6 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
             message["readings"] = readings
             mqtt_queue.put(json.dumps(message))
 
-        time.sleep(10)
+        time.sleep(0.1)
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     info_logger.info(f"[{current_time}] IO thread stopping")
