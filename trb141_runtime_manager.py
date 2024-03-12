@@ -30,11 +30,11 @@ class runtimeThreadManager:
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             self.error_logger.error(f"[{current_time}] Error starting IO thread: {e}")
 
-    def restart_gpio_thread(self, configuration):
+    def restart_gpio_thread(self, SERIAL_NUMBER):
         if self.io_thread:
             self.stop_gpio_thread()
         # Start a new thread
-        self.start_gpio_thread(configuration)
+        self.start_gpio_thread(SERIAL_NUMBER)
 
     def stop_gpio_thread(self):
         self.io_thread["stop_flag"].set()

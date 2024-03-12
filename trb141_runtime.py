@@ -239,5 +239,58 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
             mqtt_queue.put(json.dumps(message))
 
         time.sleep(0.1)
+
+    timestamp = time.time()
+    readings = []
+    message["message_id"] = uuid.uuid4().hex
+    message["timestamp"] = timestamp
+
+    for gpio in gpios:
+        try:
+            current_gpio_status = trb141_api.read_gpio_status(
+                info_logger, error_logger, gpio["address"]
+            )
+            if current_gpio_status is None:
+                raise ValueError(f"No data returned for address {node['address']}")
+            
+            # Determine if we should use 'value' or 'state'
+            value_or_state = ( current_gpio_status.get("value") if "value" in current_gpio_status else current_gpio_status.get("state") )
+
+            if value_or_state is None:
+                raise ValueError(
+                    f"'value' or 'state' not found in response for address {node['address']}"
+                )
+
+            for attribute in gpio["attributes"]:
+                reading = {}
+                name = attribute["name"]
+                time_elapsed = timestamp - attribute["timestamp"]
+                if attribute["type"] == "time":
+                    if value_or_state == "1":
+                        attribute["value"] += time_elapsed
+                    reading = {
+                        "name": name,
+                        "numericValue": attribute["value"],
+                    }
+                    readings.append(reading)
+                    attribute["timestamp"] = timestamp
+                else:
+                    reading = {
+                        "name": name,
+                    }
+                    if value_or_state == "1":
+                        reading.update({"booleanValue": True})
+                    else:
+                        reading.update({"booleanValue": False})
+                    readings.append(reading)
+                    attribute["timestamp"] = timestamp
+        except Exception as e:
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            error_logger.error(
+                f"[{current_time}] Error reading device input at address '{gpio['address']}': {e}"
+            )
+    if readings:
+        message["readings"] = readings
+        mqtt_queue.put(json.dumps(message))
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     info_logger.info(f"[{current_time}] IO thread stopping")

@@ -59,8 +59,7 @@ keep_running = True
 
 # MQTT topic details
 sub_topic = "trb141/" + str(SERIAL_NUMBER) + "/command"
-pub_topic = "trb141/" + str(SERIAL_NUMBER) + "/state"
-
+pub_topic = "trb141/state"
 
 # Signal handler function
 def signal_handler(signum, frame):
@@ -108,7 +107,7 @@ if __name__ == "__main__":
     mqtt_publish_thread.start()
     mqtt_subscribe_thread = threading.Thread(
         target=trb141_mqtt.mqtt_subscriber,
-        args=(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, BROKER_HOST, BROKER_QOS, sub_topic, BROKER_TLS_VERSION, BROKER_PROTOCOL_VERSION, mqtt_queue, thread_manager, stop_event),
+        args=(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, BROKER_HOST, BROKER_QOS, sub_topic, BROKER_TLS_VERSION, BROKER_PROTOCOL_VERSION, thread_manager, stop_event),
     )
     mqtt_subscribe_thread.start()
 
@@ -125,7 +124,7 @@ if __name__ == "__main__":
                         info_logger.info(
                             f"[{current_time}] Runtime thread has stopped. Restarting..."
                         )
-                        thread_manager.restart_gpio_thread()
+                        thread_manager.restart_gpio_thread(SERIAL_NUMBER)
                 time.sleep(10)
             except Exception as e:
                 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

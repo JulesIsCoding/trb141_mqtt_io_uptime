@@ -5,7 +5,7 @@ import trb141_utility_functions
 from datetime import datetime
 import subprocess
 
-def mqtt_subscriber(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, BROKER_HOST, BROKER_QOS, sub_topic, BROKER_TLS_VERSION, BROKER_PROTOCOL_VERSION, mqtt_queue, thread_manager, stop_event):
+def mqtt_subscriber(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, BROKER_ENDPOINT, BROKER_HOST, BROKER_QOS, sub_topic, BROKER_TLS_VERSION, BROKER_PROTOCOL_VERSION, thread_manager, stop_event):
     try:
         # Command to subscribe and listen for messages
         command = ['mosquitto_sub', '--cafile', ROOT_CA, '--cert', CERT_FILE,'--key', PRIVATE_KEY, '-h', BROKER_ENDPOINT, '-p', BROKER_HOST, '-q', BROKER_QOS, '-t', sub_topic, '--tls-version', BROKER_TLS_VERSION, '-d', '-V', BROKER_PROTOCOL_VERSION]
@@ -21,7 +21,7 @@ def mqtt_subscriber(info_logger, error_logger, ROOT_CA, PRIVATE_KEY, CERT_FILE, 
                     info_logger.info( f"[{current_time}] Received message: {output.strip()}" )
                     try:
                         payload = json.loads(output.strip())
-                        trb141_utility_functions.command(info_logger, error_logger, payload, mqtt_queue, thread_manager)
+                        trb141_utility_functions.command(info_logger, error_logger, payload, thread_manager)
                     except json.JSONDecodeError as e:
                         error_logger.error(f"[{current_time}] JSON parsing error: {e}", exc_info=True)
                 elif proc.poll() is not None:
