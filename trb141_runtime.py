@@ -170,6 +170,7 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                                 reading = {
                                     "name": name,
                                     "numericValue": attribute["value"],
+                                    "timestamp": timestamp,
                                 }
                                 readings.append(reading)
 
@@ -179,6 +180,7 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                                 reading = {
                                     "name": name,
                                     "numericValue": attribute["value"],
+                                    "timestamp": timestamp,
                                 }
                                 readings.append(reading)
                         
@@ -187,6 +189,7 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                             attribute["timestamp"] = timestamp
                             reading = {
                                 "name": name,
+                                "timestamp": timestamp,
                             }
                             if value_or_state == "1":
                                 reading.update({"booleanValue": True})
@@ -202,12 +205,14 @@ def es_runtime(info_logger, error_logger, SERIAL_NUMBER, mqtt_queue, stop_event)
                                 reading = {
                                     "name": name,
                                     "numericValue": attribute["value"],
+                                    "timestamp": timestamp,
                                 }
                                 readings.append(reading)
                                 attribute["timestamp"] = timestamp
                             else:
                                 reading = {
                                     "name": name,
+                                    "timestamp": timestamp,
                                 }
                                 if value_or_state == "1":
                                     reading.update({"booleanValue": True})

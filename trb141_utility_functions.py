@@ -1,4 +1,4 @@
-import json
+import time
 import trb141_db
 import trb141_api
 from datetime import datetime
@@ -23,6 +23,7 @@ def command(info_logger, error_logger, payload, thread_manager):
             reading = {
                 "name": name,
                 "numericValue": value,
+                "timestamp": time.time()
             }
             try:
                 trb141_db.insert_or_update_persistent_data(
