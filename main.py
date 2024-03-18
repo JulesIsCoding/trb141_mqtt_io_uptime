@@ -77,9 +77,7 @@ signal.signal(signal.SIGTERM, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 
 if __name__ == "__main__":
-    error_logger = setup_logger(
-        "error_logger", "/var/log/trb141_mqtt_io_uptime_error.log", logging.ERROR
-    )
+    error_logger = setup_logger("error_logger", "/var/log/trb141_mqtt_io_uptime_error.log", logging.ERROR)
     info_logger = setup_logger("info_logger", "/var/log/trb141_mqtt_io_uptime_info.log", logging.INFO)
 
     trb141_db.init_database(info_logger, error_logger)
