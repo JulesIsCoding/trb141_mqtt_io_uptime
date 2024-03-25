@@ -111,13 +111,15 @@ def run_command(info_logger, error_logger, command):
         error_logger.error(f"[{current_time}] Error executing command {command}: {e.output.decode()}")
 
 def update_runtime(info_logger, error_logger):
-    # Stop the trb141_mqtt_io_uptime service
-    run_command(info_logger, error_logger, "/etc/init.d/trb141_mqtt_io_uptime stop")
-
+    
     # Change directory to /storage and download the latest version of the repo
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    info_logger.info(f"[{current_time}] Downloading latest version of the repository...")
     run_command(info_logger, error_logger, "cd /storage && wget https://api.github.com/repos/JulesIsCoding/trb141_mqtt_io_uptime/tarball -O repo.tgz && tar -xzvf repo.tgz")
 
     # Remove the archive
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    info_logger.info(f"[{current_time}] Removing archive...")
     run_command(info_logger, error_logger, "rm /storage/repo.tgz")
 
     # Since the exact directory name is not known, find directories matching the pattern and move into the first one found
@@ -146,5 +148,5 @@ def update_runtime(info_logger, error_logger):
             f"[{current_time}] Error: Could not find the downloaded repository directory.", exc_info=True
         )
 
-    # Start the trb141_mqtt_io_uptime service
-    run_command(info_logger, error_logger, "/etc/init.d/trb141_mqtt_io_uptime start")
+    # Restart the trb141_mqtt_io_uptime service
+    run_command(info_logger, error_logger, "/etc/init.d/trb141_mqtt_io_uptime restart")
