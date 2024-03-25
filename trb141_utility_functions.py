@@ -101,22 +101,24 @@ def set_output(output, value):
             with open("/sys/class/gpio/gpio21/value", "w") as f:
                 f.write("1")
 
-def run_command(command):
+def run_command(info_logger, error_logger, command):
     try:
         subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
-        print(f"Command executed successfully: {command}")
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        info_logger.info(f"[{current_time}] Command executed successfully: {command}")
     except subprocess.CalledProcessError as e:
-        print(f"Error executing command {command}: {e.output.decode()}")
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        error_logger.error(f"[{current_time}] Error executing command {command}: {e.output.decode()}")
 
 def update_runtime(info_logger, error_logger):
     # Stop the trb141_mqtt_io_uptime service
-    run_command("/etc/init.d/trb141_mqtt_io_uptime stop")
+    run_command(info_logger, error_logger, "/etc/init.d/trb141_mqtt_io_uptime stop")
 
     # Change directory to /storage and download the latest version of the repo
-    run_command("cd /storage && wget https://api.github.com/repos/JulesIsCoding/trb141_mqtt_io_uptime/tarball -O repo.tgz && tar -xzvf repo.tgz")
+    run_command(info_logger, error_logger, "cd /storage && wget https://api.github.com/repos/JulesIsCoding/trb141_mqtt_io_uptime/tarball -O repo.tgz && tar -xzvf repo.tgz")
 
     # Remove the archive
-    run_command("rm /storage/repo.tgz")
+    run_command(info_logger, error_logger, "rm /storage/repo.tgz")
 
     # Since the exact directory name is not known, find directories matching the pattern and move into the first one found
     directories = subprocess.check_output("ls /storage | grep JulesIsCoding", shell=True).decode().strip().split("\n")
@@ -137,7 +139,7 @@ def update_runtime(info_logger, error_logger):
             f"mv /storage/{directory}/main.py /trb141_mqtt_io_uptime/main.py",
         ]
         for cmd in commands_to_run:
-            run_command(cmd)
+            run_command(info_logger, error_logger, cmd)
     else:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         error_logger.error(
@@ -145,4 +147,4 @@ def update_runtime(info_logger, error_logger):
         )
 
     # Start the trb141_mqtt_io_uptime service
-    run_command("/etc/init.d/trb141_mqtt_io_uptime start")
+    run_command(info_logger, error_logger, "/etc/init.d/trb141_mqtt_io_uptime start")
