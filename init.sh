@@ -21,7 +21,16 @@ opkg install python3-sqlite3
 mkdir -p /trb141_mqtt_io_uptime
 mkdir -p /etc/trb141_mqtt_io_uptime
 
-cd /storage/trb141_mqtt_io_uptime/
+# Download latest version
+cd /storage
+wget https://api.github.com/repos/JulesIsCoding/trb141_mqtt_io_uptime/tarball -O repo.tgz && tar -xzvf repo.tgz
+
+# Remove archive
+rm repo.tgz
+
+# cd into directory
+cd JulesIsCoding*
+
 # Move the package to the correct directory
 echo "Moving package to the correct directory..."
 mv trb141_api.py /trb141_mqtt_io_uptime/trb141_api.py

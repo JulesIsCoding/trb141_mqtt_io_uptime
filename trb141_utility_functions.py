@@ -2,7 +2,7 @@ import time
 import trb141_db
 import trb141_api
 from datetime import datetime
-
+import subprocess
 
 def command(info_logger, error_logger, payload, thread_manager):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -66,10 +66,12 @@ def command(info_logger, error_logger, payload, thread_manager):
                     f"[{current_time}] Error restarting runtime: {e}", exc_info=True
                 )
 
+        elif cmd == "update_runtime":
+            update_runtime(info_logger, error_logger)
+
         else:
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             info_logger.info(f"[{current_time}] Unsupported method")
-
 
 def set_output(output, value):
     # When one Relay output is open, the other one is closed; so to turn an output on or off, we have to change the value on both pins:
@@ -98,3 +100,49 @@ def set_output(output, value):
                 f.write("0")
             with open("/sys/class/gpio/gpio21/value", "w") as f:
                 f.write("1")
+
+def run_command(command):
+    try:
+        subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
+        print(f"Command executed successfully: {command}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing command {command}: {e.output.decode()}")
+
+def update_runtime(info_logger, error_logger):
+    # Stop the trb141_mqtt_io_uptime service
+    run_command("/etc/init.d/trb141_mqtt_io_uptime stop")
+
+    # Change directory to /storage and download the latest version of the repo
+    run_command("cd /storage && wget https://api.github.com/repos/JulesIsCoding/trb141_mqtt_io_uptime/tarball -O repo.tgz && tar -xzvf repo.tgz")
+
+    # Remove the archive
+    run_command("rm /storage/repo.tgz")
+
+    # Since the exact directory name is not known, find directories matching the pattern and move into the first one found
+    directories = subprocess.check_output("ls /storage | grep JulesIsCoding", shell=True).decode().strip().split("\n")
+    if directories:
+        directory = directories[0]  # Assume the first directory is the correct one
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        info_logger.info(
+            f"[{current_time}] Moving to directory: {directory}"
+        )
+        # Move the necessary files to the correct directory
+        commands_to_run = [
+            f"mv /storage/{directory}/trb141_api.py /trb141_mqtt_io_uptime/trb141_api.py",
+            f"mv /storage/{directory}/trb141_db.py /trb141_mqtt_io_uptime/trb141_db.py",
+            f"mv /storage/{directory}/trb141_mqtt.py /trb141_mqtt_io_uptime/trb141_mqtt.py",
+            f"mv /storage/{directory}/trb141_runtime_manager.py /trb141_mqtt_io_uptime/trb141_runtime_manager.py",
+            f"mv /storage/{directory}/trb141_runtime.py /trb141_mqtt_io_uptime/trb141_runtime.py",
+            f"mv /storage/{directory}/trb141_utility_functions.py /trb141_mqtt_io_uptime/trb141_utility_functions.py",
+            f"mv /storage/{directory}/main.py /trb141_mqtt_io_uptime/main.py",
+        ]
+        for cmd in commands_to_run:
+            run_command(cmd)
+    else:
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        error_logger.error(
+            f"[{current_time}] Error: Could not find the downloaded repository directory.", exc_info=True
+        )
+
+    # Start the trb141_mqtt_io_uptime service
+    run_command("/etc/init.d/trb141_mqtt_io_uptime start")
