@@ -140,6 +140,8 @@ def update_runtime(info_logger, error_logger):
             f"mv /storage/{directory}/trb141_utility_functions.py /trb141_mqtt_io_uptime/trb141_utility_functions.py",
             f"mv /storage/{directory}/main.py /trb141_mqtt_io_uptime/main.py",
         ]
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        info_logger.info(f"[{current_time}] Moving new files...")
         for cmd in commands_to_run:
             run_command(info_logger, error_logger, cmd)
     else:
@@ -149,4 +151,6 @@ def update_runtime(info_logger, error_logger):
         )
 
     # Restart the trb141_mqtt_io_uptime service
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    info_logger.info(f"[{current_time}] Restarting runtime service...")
     run_command(info_logger, error_logger, "/etc/init.d/trb141_mqtt_io_uptime restart")
