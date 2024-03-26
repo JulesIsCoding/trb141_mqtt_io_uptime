@@ -152,7 +152,7 @@ def update_runtime(info_logger, error_logger):
     cmd = f"rm -rf /storage/{directory}"
     run_command(info_logger, error_logger, cmd)
 
-    # Restart the trb141_mqtt_io_uptime service
+    # Reboot the device
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    info_logger.info(f"[{current_time}] Restarting runtime service...")
-    run_command(info_logger, error_logger, "/etc/init.d/trb141_mqtt_io_uptime restart")
+    info_logger.info(f"[{current_time}] Rebooting device...")
+    run_command(info_logger, error_logger, "reboot")
