@@ -116,7 +116,7 @@ def update_runtime(info_logger, error_logger):
     # Remove the archive
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     info_logger.info(f"[{current_time}] Removing archive...")
-    run_command(info_logger, error_logger, "rm /storage/repo.tgz")
+    run_command(info_logger, error_logger, "rm -rf /storage/repo.tgz")
 
     # Since the exact directory name is not known, find directories matching the pattern and move into the first one found
     directories = subprocess.check_output("ls /storage | grep JulesIsCoding", shell=True).decode().strip().split("\n")
@@ -145,6 +145,12 @@ def update_runtime(info_logger, error_logger):
         error_logger.error(
             f"[{current_time}] Error: Could not find the downloaded repository directory.", exc_info=True
         )
+
+    # Remove the directory
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    info_logger.info(f"[{current_time}] Removing directory...")
+    cmd = f"rm -rf /storage/{directory}"
+    run_command(info_logger, error_logger, cmd)
 
     # Restart the trb141_mqtt_io_uptime service
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
